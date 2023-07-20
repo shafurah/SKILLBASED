@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+#define BUFFER_SIZE 1024
+
+int main()
+{
+    int client_socket;
+    struct sockaddr_in server;
+    char buffer[BUFFER_SIZE];
+
+    client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket == -1)
+    {
+        perror("Socket creation failed");
+        exit(1);
+  }
+
+    server.sin_addr.s_addr = inet_addr("192.168.20.130");
+    server.sin_family = AF_INET;
+    server.sin_port = htons(2222); 
+
+    if (connect(client_socket, (struct sockaddr *)&server, sizeof(server)) < 0
+    {
+        perror("Connection failed");
+        exit(1);
+    }
+
+    int bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0); 
+    if (bytes_received < 0)
+    {
+        perror("Failed receive reply from server");
+        exit(1);
+    }
+
+    buffer[bytes_received] = '\0';
+
+    printf("Random number from server: %s\n", buffer);
+
+    close(client_socket);
+
+    return 0;
+}
